@@ -35,7 +35,7 @@ export class PropertyController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UsePipes(new ValidationPipe({ whitelist: true, groups: ['create'] }))
   create(@Body() createPropertyDto: CreatePropertyDto) {
     return createPropertyDto;
   }
