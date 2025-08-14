@@ -12,14 +12,17 @@ import {
   Post,
   Query,
   UsePipes,
+  Req,
 } from '@nestjs/common';
-import { CreatePropertyDto } from './dto/create-property-dto';
-import { ParseIdPipe } from './pipes/parse-id-pipe';
 import { ZodValidationPipe } from './pipes/zod-validation-pipe';
 import {
   createPropertySchema,
   CreatePropertyZodDto,
+  updatePropertySchema,
 } from './dto/create-property-zod-dto';
+import z from 'zod';
+import { idParamSchema } from './dto/id-param-dto';
+import { Request } from 'express';
 
 @Controller('property')
 export class PropertyController {
@@ -48,9 +51,20 @@ export class PropertyController {
 
   @Patch(':id')
   update(
-    @Param('id', ParseIdPipe) id,
-    @Body() updatePropertyDto: CreatePropertyDto,
+    @Param('id', new ZodValidationPipe(idParamSchema))
+    id: z.infer<typeof idParamSchema>,
+    @Body(new ZodValidationPipe(updatePropertySchema))
+    updatePropertyDto: z.infer<typeof updatePropertySchema>,
+    @Req() req: Request,
   ) {
+    // Get the user ip-address
+    const ip = req.ip;
+    console.log('ip', ip); // 127.0.0.1
+
+    // Get the user user-agent
+    const userAgent = req.headers['user-agent'];
+    console.log('userAgent', userAgent); // Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+
     return updatePropertyDto;
   }
 }
